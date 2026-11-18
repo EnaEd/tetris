@@ -11,10 +11,20 @@ int fallDelay = 500;
 var board = new Board();
 board.SpawnShape();
 Guard.Against.Null(board.CurrentShape);
-
 Stopwatch timer = Stopwatch.StartNew();
 
-while (true)
+bool isRunning = true;
+var controls = new Dictionary<ConsoleKey, Action>
+{
+    [ConsoleKey.LeftArrow]  = () => { if (!board.CheckCollision(board.CurrentShape.X - 1, board.CurrentShape.Y)) board.CurrentShape.MoveLeft(); },
+    [ConsoleKey.RightArrow] = () => { if (!board.CheckCollision(board.CurrentShape.X + 1, board.CurrentShape.Y)) board.CurrentShape.MoveRight(); },
+    [ConsoleKey.DownArrow]  = () => { if (!board.CheckCollision(board.CurrentShape.X, board.CurrentShape.Y + 1)) board.CurrentShape.MoveDown(); },
+    [ConsoleKey.UpArrow]    = board.RotateShape,
+    [ConsoleKey.Spacebar]   = () => { if (Drop()) isRunning = false; },
+};
+
+
+while (isRunning)
 {
     if (Console.KeyAvailable)
     {
@@ -24,34 +34,10 @@ while (true)
             break;
         }
 
-        if (key == ConsoleKey.LeftArrow && !board.CheckCollision(board.CurrentShape.X - 1, board.CurrentShape.Y))
+        if (controls.TryGetValue(key, out var action))
         {
-            board.CurrentShape.MoveLeft();
-        }
-
-        if (key == ConsoleKey.RightArrow && !board.CheckCollision(board.CurrentShape.X + 1, board.CurrentShape.Y))
-        {
-            board.CurrentShape.MoveRight();
-        }
-
-        if (key == ConsoleKey.DownArrow && !board.CheckCollision( board.CurrentShape.X, board.CurrentShape.Y + 1))
-        {
-            board.CurrentShape.MoveDown();
-        }
-        
-        if (key == ConsoleKey.UpArrow)
-        {
-            board.RotateShape();
-        }
-        
-        if (key == ConsoleKey.Spacebar)
-        {
-            while (!board.CheckCollision(board.CurrentShape.X, board.CurrentShape.Y + 1))
-            {
-                board.CurrentShape.MoveDown();
-            }
-            timer.Restart();
-            if (!board.LockAndSpawn())
+            action();
+            if (!isRunning)
             {
                 break;
             }
@@ -133,4 +119,20 @@ void Draw()
 
     sb.AppendLine("<!" + new string('=', Board.Width * 2) + "!>");
     Console.Write(sb.ToString());
+}
+
+bool Drop()
+{
+    while (!board.CheckCollision(board.CurrentShape.X, board.CurrentShape.Y + 1))
+    {
+        board.CurrentShape.MoveDown();
+    }
+    timer.Restart();
+    
+    if (!board.LockAndSpawn())
+    {
+        return true;
+    }
+
+    return false;
 }

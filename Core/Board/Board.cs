@@ -25,24 +25,25 @@ public class Board
     
     public void SpawnShape()
     {
-        CurrentShape = Random.Shared.GetItems([..Shapes],1).First();
+        CurrentShape = Random.Shared.GetItems([..Shapes],1).First().Copy();
         
         CurrentShape.X = Width / 2 - CurrentShape.Blocks.GetLength(1) / 2;
         CurrentShape.Y = 0;
     }
 
-    public bool CheckCollision(int nextX, int nextY)
+    public bool CheckCollision(int nextX, int nextY, Shape? shape = null)
     {
-        Guard.Against.Null(CurrentShape);
+        shape ??= CurrentShape;
+        Guard.Against.Null(shape);
         
-        int rows = CurrentShape.Blocks.GetLength(0);
-        int cols = CurrentShape.Blocks.GetLength(1);
+        int rows = shape.Blocks.GetLength(0);
+        int cols = shape.Blocks.GetLength(1);
 
         for (int y = 0; y < rows; y++)
         {
             for (int x = 0; x < cols; x++)
             {
-                if (CurrentShape.Blocks[y, x] == 0)
+                if (shape.Blocks[y, x] == 0)
                 {
                     continue;
                 }
@@ -95,7 +96,7 @@ public class Board
 
         foreach (int offsetX in kicks)
         {
-            if (!CheckCollision(shape.X + offsetX, shape.Y))
+            if (!CheckCollision(shape.X + offsetX, shape.Y, shape))
             {
                 CurrentShape = shape;
                 CurrentShape.X += offsetX;
