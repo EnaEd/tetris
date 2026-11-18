@@ -51,7 +51,10 @@ while (true)
                 board.CurrentShape.MoveDown();
             }
             timer.Restart();
-            board.LockAndSpawn();
+            if (!board.LockAndSpawn())
+            {
+                break;
+            }
         }
     }
 
@@ -78,6 +81,7 @@ while (true)
     Thread.Sleep(20);
 }
 
+Console.SetBufferSize(Math.Max(Console.BufferWidth, Board.Width * 2 + 10), Math.Max(Console.BufferHeight, Board.Height + 5));
 Console.SetCursorPosition(0, Board.Height + 2);
 Console.WriteLine($"ИГРА ОКОНЧЕНА! Итоговый счёт: {board.TotalScore}");
 Console.CursorVisible = true;

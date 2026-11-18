@@ -51,12 +51,12 @@ public class Board
                 var borderX = nextX + x;
                 var borderY = nextY + y;
 
-                if (borderX < 0 || borderX >= Width || borderY >= Height)
+                if (borderX < 0 || borderX >= Width || borderY < 0 || borderY >= Height)
                 {
                     return true;
                 }
 
-                if (borderY >= 0 && Borders[borderY, borderX] == 1)
+                if (Borders[borderY, borderX] == 1)
                 {
                     return true;
                 }
