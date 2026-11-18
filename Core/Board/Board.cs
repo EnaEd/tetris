@@ -9,7 +9,7 @@ public class Board
     public static readonly int Height = 20;
 
     private const int LineScore = 100;
-    private Shape[] Shapes { get; } = 
+    private List<Shape> Shapes { get; } = 
     [
         new IShape(),
         new JShape(),
@@ -20,13 +20,12 @@ public class Board
         new ZShape()
     ];
     public int[,] Borders { get; } = new int[Height, Width];
-    
     public Shape? CurrentShape { get; private set; }
     public int TotalScore { get; private set; }
     
     public void SpawnShape()
     {
-        CurrentShape = Random.Shared.GetItems(Shapes,1).First();
+        CurrentShape = Random.Shared.GetItems([..Shapes],1).First();
         
         CurrentShape.X = Width / 2 - CurrentShape.Blocks.GetLength(1) / 2;
         CurrentShape.Y = 0;
